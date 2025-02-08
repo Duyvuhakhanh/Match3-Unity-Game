@@ -4,6 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Profiling;
+using Utility;
+using Object = UnityEngine.Object;
 
 public class Board
 {
@@ -42,18 +45,14 @@ public class Board
     private void CreateBoard()
     {
         Vector3 origin = new Vector3(-boardSizeX * 0.5f + 0.5f, -boardSizeY * 0.5f + 0.5f, 0f);
-        GameObject prefabBG = Resources.Load<GameObject>(Constants.PREFAB_CELL_BACKGROUND);
+        Cell prefabBG = ObjectCache<Cell>.GetCachedObject(Constants.PREFAB_CELL_BACKGROUND);
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
             {
-                GameObject go = GameObject.Instantiate(prefabBG);
-                go.transform.position = origin + new Vector3(x, y, 0f);
-                go.transform.SetParent(m_root);
-
-                Cell cell = go.GetComponent<Cell>();
+                Cell cell = Object.Instantiate(prefabBG, m_root);
+                cell.transform.position = origin + new Vector3(x, y, 0f);
                 cell.Setup(x, y);
-
                 m_cells[x, y] = cell;
             }
         }
@@ -69,7 +68,6 @@ public class Board
                 if (x > 0) m_cells[x, y].NeighbourLeft = m_cells[x - 1, y];
             }
         }
-
     }
 
     internal void Fill()

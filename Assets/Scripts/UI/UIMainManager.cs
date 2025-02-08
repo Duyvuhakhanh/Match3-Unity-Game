@@ -10,6 +10,7 @@ public class UIMainManager : MonoBehaviour
     private IMenu[] m_menuList;
 
     private GameManager m_gameManager;
+    private GameManager.eLevelMode m_levelMode;
 
     private void Awake()
     {
@@ -117,5 +118,11 @@ public class UIMainManager : MonoBehaviour
     internal void ShowGameMenu()
     {
         m_gameManager.SetState(GameManager.eStateGame.GAME_STARTED);
+    }
+    public void RestartLevel()
+    {
+        m_gameManager.ClearLevel();
+        m_gameManager.Reset();
+        m_gameManager.LoadLevel(m_gameManager.PreLevelMode);
     }
 }

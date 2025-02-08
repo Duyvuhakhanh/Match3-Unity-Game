@@ -27,6 +27,7 @@ public class Board
     private Transform m_root;
 
     private int m_matchMin;
+    private Dictionary<NormalItem.eNormalType, int> m_typeItemDic;
 
     public Board(Transform transform, GameSettings gameSettings)
     {
@@ -130,20 +131,58 @@ public class Board
             }
         }
     }
+    internal NormalItem.eNormalType GetLeastAmountType(Cell itemCell)
+    {
+        m_typeItemDic?.Clear();
+        m_typeItemDic = new Dictionary<NormalItem.eNormalType, int>();
+        List<NormalItem.eNormalType> ignoreTypes = new List<NormalItem.eNormalType>();
+        AddIgnoreType(itemCell.NeighbourBottom, ref ignoreTypes);
+        AddIgnoreType(itemCell.NeighbourUp, ref ignoreTypes);
+        AddIgnoreType(itemCell.NeighbourLeft, ref ignoreTypes);
+        AddIgnoreType(itemCell.NeighbourRight, ref ignoreTypes);
+        for (int x = 0; x < boardSizeX; x++)
+        {
+            for (int y = 0; y < boardSizeY; y++)
+            {
+                Cell cell = m_cells[x, y];
+                if (cell.IsEmpty) continue;
 
+                if (cell.Item is not NormalItem item) continue;
+
+                NormalItem.eNormalType type = item.ItemType;
+                if (ignoreTypes.Contains(type)) continue;
+                if (!m_typeItemDic.TryAdd(type, 1))
+                {
+                    m_typeItemDic[type]++;
+                }
+            }
+        }
+        m_typeItemDic = m_typeItemDic.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        return m_typeItemDic.FirstOrDefault().Key;
+    }
+    private static void AddIgnoreType(Cell cell, ref List<NormalItem.eNormalType> ignoreTypes)
+    {
+
+        if (!cell) return;
+        NormalItem nitem = cell.Item as NormalItem;
+        if (nitem != null)
+        {
+            ignoreTypes.Add(nitem.ItemType);
+        }
+    }
 
     internal void FillGapsWithNewItems()
     {
+        
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
             {
                 Cell cell = m_cells[x, y];
                 if (!cell.IsEmpty) continue;
-
                 NormalItem item = new NormalItem();
 
-                item.SetType(Utils.GetRandomNormalType());
+                item.SetType(GetLeastAmountType(cell));
                 item.SetView();
                 item.SetViewRoot(m_root);
 

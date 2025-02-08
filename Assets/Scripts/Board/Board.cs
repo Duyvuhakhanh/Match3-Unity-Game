@@ -38,19 +38,17 @@ public class Board
         this.boardSizeY = gameSettings.BoardSizeY;
 
         m_cells = new Cell[boardSizeX, boardSizeY];
-
         CreateBoard();
     }
 
     private void CreateBoard()
     {
         Vector3 origin = new Vector3(-boardSizeX * 0.5f + 0.5f, -boardSizeY * 0.5f + 0.5f, 0f);
-        Cell prefabBG = ObjectCache<Cell>.GetCachedObject(Constants.PREFAB_CELL_BACKGROUND);
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
             {
-                Cell cell = Object.Instantiate(prefabBG, m_root);
+                Cell cell = CellPooling.GetCell(m_root, ObjectCache<Cell>.GetCachedObject(Constants.PREFAB_CELL_BACKGROUND));
                 cell.transform.position = origin + new Vector3(x, y, 0f);
                 cell.Setup(x, y);
                 m_cells[x, y] = cell;
@@ -667,7 +665,7 @@ public class Board
                 Cell cell = m_cells[x, y];
                 cell.Clear();
 
-                GameObject.Destroy(cell.gameObject);
+                CellPooling.ReturnCell(cell);
                 m_cells[x, y] = null;
             }
         }

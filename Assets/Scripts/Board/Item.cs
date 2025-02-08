@@ -24,8 +24,11 @@ public class Item
             {
                 View = GameObject.Instantiate(prefab).transform;
             }
+            var spriteRenderer = prefab.GetComponent<SpriteRenderer>();
+            spriteRenderer.sprite = GetSprite();
         }
     }
+    protected virtual Sprite GetSprite() { return null; }
 
     protected virtual string GetPrefabName() { return string.Empty; }
 
@@ -36,7 +39,7 @@ public class Item
 
     internal void AnimationMoveToPosition()
     {
-        if (View == null) return;
+        if (!View) return;
 
         View.DOMove(Cell.transform.position, 0.2f);
     }

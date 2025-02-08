@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Utility;
 
 public class BonusItem : Item
 {
@@ -40,7 +41,10 @@ public class BonusItem : Item
 
         return prefabname;
     }
-
+    protected override Sprite GetSprite()
+    {
+        return SpriteService.LoadBonusItemSprite(ItemType);
+    }
     internal override bool IsSameType(Item other)
     {
         BonusItem it = other as BonusItem;
